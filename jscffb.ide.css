@@ -1,0 +1,39 @@
+.well{
+    border: none;  
+}
+
+body{
+    padding-top: 70px;
+}
+
+#codeArea{
+    /*background-color: blueviolet;*/
+    min-height: 300px;
+}
+
+/* LINE CODE STYLE */
+.line{
+    /* padding-top: 0px;*/
+    text-align: left;
+    font-family: "Operator Mono SSm A", "Operator Mono SSm B", "Source Code Pro", "Menlo", "Consolas", "Monaco", "monospace";
+    font-size: 16px;
+    /*background-color: lightyellow;*/
+}
+
+.line .number{
+    color: green; 
+    border-right: 1px solid gray;
+    padding-right: 5px;
+    float: left;
+}
+
+.line .text{
+    padding-left: 20px;
+    color: lightblue;
+    float: left;   
+    /*background-color: lightcoral;*/
+   
+}
+
+
+
