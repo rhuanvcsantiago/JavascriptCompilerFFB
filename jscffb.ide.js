@@ -10,10 +10,12 @@
 */
 
 
+var compiler = new Compiler();
 var CODE_AREA = $("#codeArea");
 var ROWS_COUNT = $("#codeArea");
 var ARRAY_ROWS = $(".row.line");
 var ARRAY_ROWS_TEXT = $(".col-xs-11.text");
+var RUN_BUTTON = $("#runButton");
 
 function insertRowBelow(currentRowNumber, currentRowText) {
 
@@ -78,6 +80,19 @@ function getAllCode(){
         string += $( this ).text() + "\n";
     })
     return string;   
+}
+
+function toCodeObject(){
+    var code = new Code;
+    ARRAY_ROWS.each(function(){
+        $($(ARRAY_ROWS[0]).children()[1]).text()
+        var text    = $( $( this ).children()[1] ).text();
+        var number  = $( $( this ).children()[0] ).text();
+
+        code.pushRow(number, text);
+    })
+
+    return code; 
 }
 
 function countRows() {
@@ -162,4 +177,6 @@ CODE_AREA.on("focusout", "div.col-xs-11.text", function (e) {
     // formating text
     // console.log($(this).text());              
 });
-// console.log();
+
+RUN_BUTTON.click( function(){ compiler = new Compiler( toCodeObject() ) });
+
