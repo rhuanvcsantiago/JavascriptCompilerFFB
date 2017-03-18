@@ -84,10 +84,11 @@ function getAllCode(){
 
 function toCodeObject(){
     var code = new Code;
-    ARRAY_ROWS.each(function(){
-        $($(ARRAY_ROWS[0]).children()[1]).text()
-        var text    = $( $( this ).children()[1] ).text();
+
+    $(".row.line").each(function(){
+
         var number  = $( $( this ).children()[0] ).text();
+        var text    = $( $( this ).children()[1] ).text();
 
         code.pushRow(number, text);
     })
@@ -167,6 +168,11 @@ CODE_AREA.on("keydown", "div.col-xs-11.text", function (e) {
         // changeFocusToNewRow();
         return false;       
     }
+    
+    //getting code to object 
+    compiler.code = toCodeObject();
+    compiler.analex();
+    
 });
 
 CODE_AREA.on("focus", "div.col-xs-11.text", function (e) {    
@@ -174,9 +180,10 @@ CODE_AREA.on("focus", "div.col-xs-11.text", function (e) {
 });
 
 CODE_AREA.on("focusout", "div.col-xs-11.text", function (e) {    
+    
     // formating text
     // console.log($(this).text());              
 });
 
-RUN_BUTTON.click( function(){ compiler = new Compiler( toCodeObject() ) });
+RUN_BUTTON.click( function(){ compiler.code = toCodeObject() });
 
