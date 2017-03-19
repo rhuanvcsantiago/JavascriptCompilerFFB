@@ -33,6 +33,15 @@ function Compiler(){
             logBonitinho(string, "data");
         }
 
+        function printError(error){
+            var string = "erros ==== qtd:" + error.length + " ==== \n\n";
+            for (var i = 0; i < error.length; i++) {
+                var element = error[i];
+                string += "erro: " + element[0]+"\nposition("+element[1].linha+","+element[1].coluna+")\n\n";
+            }
+            logBonitinho(string, "data");
+        }
+
         console.clear();
         console.log("%c==============================\n===========  DEBUG ===========\n==============================", "background: black; color: white; font-size: 20px; display: block;")
         logBonitinho("Código Lido:", "info");
@@ -40,11 +49,13 @@ function Compiler(){
         logBonitinho("Executando Analex...", "info");
         console.time();
         this.analex.tokenizer(this.codeFile);
-        logBonitinho("Analex finalizado.", "info");
         console.timeEnd("Tempo de execução:");
         logBonitinho("Tabela de Simbolos:", "info");
-        
         printSymbolsTable(this.analex.symbolsTable);
+        logBonitinho("Array de Erros:", "info");
+        printError(this.analex.error);
+
+
 
     }
 }
