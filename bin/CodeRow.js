@@ -8,17 +8,17 @@ function CodeRow(n, t){
     }
 
     this.col = function(i) {
-        if(text[i-1] == undefined)
+        if(this.text[i-1] == undefined)
             throw new Error("[NUMERO DA COLUNA][ " + i + " ] solicitada não existe nesse objeto ROW.");
         else 
-            return text[i-1];
+            return this.text[i-1];
     } 
 
     this.colAt = function(i) {
-        if(text[i] == undefined)
+        if(this.text[i] == undefined)
             throw new Error("[INDEX DA COLUNA][ " + i + " ] solicitada não existe nesse objeto ROW.");
         else 
-            return text[i];
+            return this.text[i];
     }  
 
     this.isEmpty = function(){

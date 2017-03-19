@@ -1,17 +1,21 @@
 function Analex(){
 
-    this.symbolTable = []; //Array Tokens
+    this.symbolsTable = []; //Array Tokens
+	this.error = [];
     
     this.tokenizer = function(codeFile){
+		this.symbolsTable = []; 
+		this.error = [];
+
         var token = "";
         var classe = "";
 		var classe_anterior = "";   
         var posicao = { linha:0 , coluna:0 };
 		
 		for( var i = 1 ; i <= codeFile.rowsCount() ; i++ ) {
-			var row = codeFile.getRow(i); 
+			var row = codeFile.row(i); 
 			for (var j = 1; j <= row.length(); j++) {
-				var char = row.getCol(j);
+				var char = row.col(j);
 				classe = "";
 				if(token == ""){
 					posicao.linha = i;
@@ -58,16 +62,16 @@ function Analex(){
 						break;
 					} else if (classe == "operacao4") {
 						classe = "comentario_multilinha";
-						if(codeFile.isEOF(i,j)) {
+						if(codeFile.isPositionValid(i,j)) {
 							this.error.push(["Comentario não fechado",posicao]);							
 							break;
 						}						
 						j++;						
 						var mudouLinha = false;												
-						while( !codeFile.isEOF(i,j) ){
-							var char2 = codeFile.getCharAt(i,j);
-							if( j == codeFile.getRow(i).length()) {
-								if(codeFile.isEOF(i,j)) {
+						while( !codeFile.isPositionValid(i,j) ){
+							var char2 = codeFile.row(i).col(j);
+							if( j == codeFile.row(i).length()) {
+								if(codeFile.isPositionValid(i,j)) {
 									break;
 								}
 								i++;
@@ -75,7 +79,7 @@ function Analex(){
 								mudouLinha=true;
 								continue;
 							}
-							var char3 = codeFile.getCharAt(i,j+1);													
+							var char3 = codeFile.row(i).col(j+1);													
 							var multinhaInvertido = char2+char3;
 							if( multinhaInvertido == "*/" ) {
 								this.symbolsTable.push([token,"comentarioML",posicao]);
@@ -85,7 +89,7 @@ function Analex(){
 							}							
 							j++;
 						}	
-						if(codeFile.isEOF(i,j)) {
+						if(codeFile.isPositionValid(i,j)) {
 							this.error.push(["Comentario não fechado",posicao]);							
 						}
 						if(mudouLinha) {

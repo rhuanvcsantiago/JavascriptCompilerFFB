@@ -58,7 +58,7 @@ function CodeFile(){
         if(i < 0 || i > lastRowIndex)
             return true;
         
-        var lastColIndex = rowAt(i).length()-1;
+        var lastColIndex = this.rowAt(i).length()-1;
 
         if(j < 0 || j > lastColIndex)
             return true;
@@ -73,7 +73,7 @@ function CodeFile(){
         if(i < 1 || i > lastRowPosition)
             return true;
         
-        var lastColPosition = row(i).length();
+        var lastColPosition = this.row(i).length();
 
         if(j < 1 || j > lastColPosition)
             return true;
