@@ -12,9 +12,6 @@
 
 var compiler = new Compiler();
 var CODE_AREA = $("#codeArea");
-var ROWS_COUNT = $("#codeArea");
-var ARRAY_ROWS = $(".row.line");
-var ARRAY_ROWS_TEXT = $(".col-xs-11.text");
 var RUN_BUTTON = $("#runButton");
 
 function insertRowBelow(currentRowNumber, currentRowText) {
@@ -83,7 +80,7 @@ function getAllCode(){
 }
 
 function toCodeObject(){
-    var code = new Code;
+    var code = new CodeFile;
 
     $(".row.line").each(function(){
 
@@ -162,28 +159,29 @@ CODE_AREA.on("keydown", "div.col-xs-11.text", function (e) {
             // excluir conteúdo restante da linha
             rowTextObject.text(rowStringToStay);
         }
-
         // criar nova linha
         insertRowBelow(rowNumber, rowStringToMove);
         // changeFocusToNewRow();
         return false;       
-    }
-    
-    //getting code to object 
-    compiler.code = toCodeObject();
-    compiler.analex();
-    
+    } 
 });
 
 CODE_AREA.on("focus", "div.col-xs-11.text", function (e) {    
     $(this).text( $(this).text() );              
 });
 
+CODE_AREA.on("keyup", "div.col-xs-11.text", function (e) {    
+    compiler.codeFile = toCodeObject();
+    compiler.runOnKeyUp();             
+});
+
 CODE_AREA.on("focusout", "div.col-xs-11.text", function (e) {    
-    
     // formating text
     // console.log($(this).text());              
 });
 
-RUN_BUTTON.click( function(){ compiler.code = toCodeObject() });
+RUN_BUTTON.click( function(){ 
+    compiler.codeFile = toCodeObject();
+    compiler.runOnButtonPlay(); 
+});
 
