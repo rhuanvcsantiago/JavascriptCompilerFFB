@@ -9,7 +9,7 @@ function Compiler(){
 
         console.log( this.codeFile.toString() );
 
-        this.analex.tokenizer(this.codeFile);
+        //this.analex.tokenizer(this.codeFile);
 
     }
 }

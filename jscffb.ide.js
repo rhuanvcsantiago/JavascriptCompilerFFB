@@ -80,7 +80,7 @@ function getAllCode(){
 }
 
 function toCodeObject(){
-    var code = new Code;
+    var code = new CodeFile;
 
     $(".row.line").each(function(){
 
@@ -171,7 +171,7 @@ CODE_AREA.on("focus", "div.col-xs-11.text", function (e) {
 });
 
 CODE_AREA.on("keyup", "div.col-xs-11.text", function (e) {    
-    compiler.code = toCodeObject();
+    compiler.codeFile = toCodeObject();
     compiler.runOnKeyUp();             
 });
 
@@ -181,7 +181,7 @@ CODE_AREA.on("focusout", "div.col-xs-11.text", function (e) {
 });
 
 RUN_BUTTON.click( function(){ 
-    compiler.code = toCodeObject();
+    compiler.codeFile = toCodeObject();
     compiler.runOnButtonPlay(); 
 });
 
