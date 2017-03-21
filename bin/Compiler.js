@@ -24,13 +24,28 @@ function Compiler(){
             console.log("%c"+msgm, css);
         }
 
-        function printSymbolsTable(symbolsTable){
-            var string = "tabela simbolos ==== qtd:" + symbolsTable.length + " ==== \n\n";
-            for (var i = 0; i < symbolsTable.length; i++) {
-                var element = symbolsTable[i];
-                string += "token: " + element[0]+"\nclass: "+element[1]+"\nposition("+element[2].linha+","+element[2].coluna+")\n\n";
-            }
-            logBonitinho(string, "data");
+       function printSymbolsTable(symbolsTable){
+           var string = "";
+           var count = 0;
+            Object.keys(symbolsTable.array).forEach(function(key){                            
+                count++;
+                var token  = key;
+                var classe = symbolsTable.array[key].classe;
+                var positions = symbolsTable.array[key].positions;
+
+                string += "token: " + token + "\nclass: " + classe + "\npositions: ";
+
+                for (var i = 0; i < positions.length; i++) {
+                    var pos = positions[i];
+                    string += "(" + pos.row + "," + pos.col + ")";
+                }
+
+                string += "\n\n";    
+
+                
+            })
+            string = "tabela simbolos ==== qtd:" + count + " ==== \n\n" + string;
+            logBonitinho(string, "data");            
         }
 
         function printError(error){

@@ -30,9 +30,7 @@ function CodeFile(){
         var qtdRows = this.rowsCount();
 
         for (var i = 0; i < qtdRows; i++) {
-            string += this.rowAt(i).text; 
-            if( i < qtdRows-1 )
-                string += "\n";      
+            string += this.rowAt(i).text;       
         }
         return string;
     }
