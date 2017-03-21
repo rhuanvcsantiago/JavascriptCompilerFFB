@@ -288,4 +288,8 @@ function symbolsTable(row, col){
 	this.clean = function clean(){
 		this.array = [];
 	}
+
+	this.teste = function teste(){
+		
+	}
 }
