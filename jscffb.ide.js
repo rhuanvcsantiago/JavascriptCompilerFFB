@@ -87,7 +87,7 @@ function toCodeObject(){
         var number  = $( $( this ).children()[0] ).text();
         var text    = $( $( this ).children()[1] ).text();
 
-        code.pushRow(number, text);
+        code.pushRow(number, text + '\n');
     })
 
     return code; 

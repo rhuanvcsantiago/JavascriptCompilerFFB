@@ -48,7 +48,9 @@ function Compiler(){
         logBonitinho( this.codeFile.toString(), "data" );
         logBonitinho("Executando Analex...", "info");
         console.time();
+
         this.analex.tokenizer(this.codeFile);
+        
         console.timeEnd("Tempo de execução:");
         logBonitinho("Tabela de Simbolos:", "info");
         printSymbolsTable(this.analex.symbolsTable);
