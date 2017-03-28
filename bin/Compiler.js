@@ -52,7 +52,7 @@ function Compiler(){
             var string = "erros ==== qtd:" + error.length + " ==== \n\n";
             for (var i = 0; i < error.length; i++) {
                 var element = error[i];
-                string += "erro: " + element[0]+"\nposition("+element[1].linha+","+element[1].coluna+")\n\n";
+                string += "erro: " + element[0]+"\nposition("+element[1].row+","+element[1].col+")\n\n";
             }
             logBonitinho(string, "data");
         }

@@ -32,7 +32,12 @@ body{
     color: lightblue;
     float: left;   
     /*background-color: lightcoral;*/
-   
+  
+}
+
+#codeArea{
+    background-color: black;
+    padding-top: 10px;
 }
 
 

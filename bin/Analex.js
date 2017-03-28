@@ -45,17 +45,19 @@ function Analex(){
 					classe = "espaco";
 				} else if (char == ';') {
 					classe = "ponto_e_virgula";
-				} else if (char == '(' || char == ')' || char == '{' || char == '}' || char == '[' || char == ']') {
+				} else if (char == '(' || char == ')' || char == '{' || char == '}' || char == '[' || char == ']' || char == ',') {
 					classe = "separador";
 				} else if(char == '\n') {
 					classe = "nova_linha";
 				} else if(char == '.') {
 					classe = "ponto";
 				} else {
-					this.error.push(["Caracter Inválido: "+token ,posicao]);
-					classe_anterior = "";
-					token = "";
-					break;
+					if(classe_anterior!='string') {
+						this.error.push(["Caracter Inválido: "+token ,posicao]);
+						classe_anterior = "";
+						token = "";
+						break;
+					}
 				}						
 																					
 				if(classe_anterior=="string"){
@@ -157,7 +159,7 @@ function Analex(){
 				} else if(classe_anterior=="char") { 
 					/* QUEBRAS: a<operador> | a<separador> | a<espaco> | a<ponto_e_virgula>
 					   NAO PODE: a<string> | a<ponto> | a<nova_linha>  */
-					   if( /boolean\s|char\s|class\s|double\s|new\s|return\s/i.test(token)) {
+					   if( /boolean\s|char\s|string\s|class\s|double\s|new\s|return\s/i.test(token)) {
 							this.symbolsTable.push(token.substr(0,token.length-1),"palavra_reservada_c_espaco",posicao);
 							classe_anterior = "";
 							token = "";
