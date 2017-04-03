@@ -59,7 +59,7 @@ function removeCurrentRow(currentRowNumber, currentRowText){
 }
 
 function createRowText(lineNumber, lineContent) {
-    return '<div class="row line"><div class="col-xs-1 number">' + lineNumber + '</div><div class="col-xs-11 text" contenteditable="true">' + lineContent + '</div></div>';
+    return '<div class="row line"><div class="col number">' + lineNumber + '</div><div class="col-xs-11 text" contenteditable="true">' + lineContent + '</div></div>';
 }
 
 function updateRowNumbersBelow(currentRow) {
@@ -113,9 +113,11 @@ function placeCaretAt(node, position) {
 CODE_AREA.on("keydown", "div.col-xs-11.text", function (e) {
 
     //objects
+    
     var rowObject = $(this).parent();
     var rowTextObject = $(this);
     var rowNumberObject = $(rowObject.children()[0]);
+    var codeFile = $(rowObject).parent()
 
     // usefull values
     var rowNumber = Number(rowNumberObject.text());
@@ -146,6 +148,34 @@ CODE_AREA.on("keydown", "div.col-xs-11.text", function (e) {
             return false;
         }
 
+    }
+
+    //  UP ARROW
+    if (e.keyCode === 38) { 
+
+        
+
+        var prevRow = $(rowObject.prev().children()[1]);
+       // var prevRowLength = prevRow.text().length;
+     //   var positionToGo = 0;
+
+       // if( rowPositionClick >= prevRowLength){
+     //       positionToGo = prevRowLength;
+     //   } else if( rowPositionClick < prevRowLength ) {
+    //        positionToGo = rowPositionClick;
+    //    } 
+
+
+        prevRow.focus();       
+       
+        //prevRow.get().setSelectionRange(positionToGo, positionToGo);
+
+    }
+    //  DOWN ARROW
+    if (e.keyCode === 40) {
+         var nextRow = $(rowObject.next().children()[1]);
+         nextRow.focus();
+       
     }
     
     //ENTER
@@ -185,3 +215,18 @@ RUN_BUTTON.click( function(){
     compiler.runOnButtonPlay(); 
 });
 
+function setCaretPosition(elem, caretPos) {
+    if(elem.createTextRange) {
+        var range = elem.createTextRange();
+        range.move('character', caretPos);
+        range.select();
+    }
+    else {
+        if(elem.selectionStart) {
+            elem.focus();
+            elem.setSelectionRange(caretPos, caretPos);
+        }
+        else
+            elem.focus();
+    }
+}
