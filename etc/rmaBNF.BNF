@@ -15,6 +15,7 @@
 <CODE_BLOCK>   := <ATTRIBUTIONS>  <END_LINE>
 <CODE_BLOCK>   := <FUNCTION_BLOCK>
 <CODE_BLOCK>   := <LOOP_BLOCK> 
+<CODE_BLOCK>   := <RETURN_EXPRESSION> <END_LINE> 
 
 <DECLARATIONS>   := <ARRAY_DECLARATION> 
 <DECLARATIONS>   := <VARIABLE_DECLARATION>
@@ -39,8 +40,10 @@
 <LITERAL_SEQUENCE>    =: <NUMBER> <IDENTIFIER_SEPARATOR> <LITERAL_SEQUENCE> 
 <LITERAL_SEQUENCE>    =: <NUMBER> <IDENTIFIER_SEPARATOR> <NUMBER>       
 
-<IDENTIFIER_SEQUENCE>   =: <IDENTIFIER> <IDENTIFIER_SEPARATOR> <IDENTIFIER_SEQUENCE> 
-<IDENTIFIER_SEQUENCE>   =: <IDENTIFIER> <IDENTIFIER_SEPARATOR> <IDENTIFIER>
+<IDENTIFIER_SEQUENCE>         =: <IDENTIFIER> <IDENTIFIER_SEPARATOR> <IDENTIFIER_SEQUENCE> 
+<IDENTIFIER_SEQUENCE>         =: <IDENTIFIER> <IDENTIFIER_SEPARATOR> <IDENTIFIER>
+<TYPED_IDENTIFIER_SEQUENCE>   =: <IDENTIFIER> <IDENTIFIER_SEPARATOR> <IDENTIFIER>
+
  
 <FUNCTION_BLOCK>        =: <TYPE>  <IDENTIFIER>  <FUNCTION_ARGS> 
                            <CONTEXT_SEPARATOR_OPEN> 
@@ -54,10 +57,11 @@
 
 <FUNCTION_CALL>         =: <IDENTIFIER> <FUNCTION_ARGS>
 
-<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN>  <IDENTIFIER>           <PRIMARY_SEPARATOR_CLOSE>                                   
-<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN>  <IDENTIFIER_SEQUENCE>  <PRIMARY_SEPARATOR_CLOSE> 
-<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN>  <EXPRESSION>           <PRIMARY_SEPARATOR_CLOSE> 
-<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN>  <LITERAL_SEQUENCE>     <PRIMARY_SEPARATOR_CLOSE>                                  
+<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN> <PRIMARY_SEPARATOR_CLOSE>
+<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN> <TYPE> <IDENTIFIER>         <PRIMARY_SEPARATOR_CLOSE>                                   
+<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN> <TYPED_IDENTIFIER_SEQUENCE> <PRIMARY_SEPARATOR_CLOSE> 
+<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN> <EXPRESSION>                <PRIMARY_SEPARATOR_CLOSE> 
+<FUNCTION_ARGS>         =: <PRIMARY_SEPARATOR_OPEN> <LITERAL_SEQUENCE>          <PRIMARY_SEPARATOR_CLOSE>                                  
 
 <EXPRESSION>         =: <PRIMARY_SEPARATOR_OPEN>  <BASIC_EXPRESSION>    <OPERATOR>  <BASIC_EXPRESSION>    <PRIMARY_SEPARATOR_CLOSE>
 <EXPRESSION>         =: <PRIMARY_SEPARATOR_OPEN>  <COMPLEX_EXPRESSION>  <OPERATOR>  <COMPLEX_EXPRESSION>  <PRIMARY_SEPARATOR_CLOSE>                                                                                    
@@ -94,6 +98,12 @@
 <COMPARISON_EXPRESSION> =: <FUNCTION_CALL> <COMPASISON_OPERATOR> <EXPRESSION>
 <COMPARISON_EXPRESSION> =: <FUNCTION_CALL> <COMPASISON_OPERATOR> <FUNCTION_CALL>
 
+<RETURN_EXPRESSION>     =: <RETURN> <IDENTIFIER>
+<RETURN_EXPRESSION>     =: <RETURN> <NUMBER>  
+<RETURN_EXPRESSION>     =: <RETURN> <EXPRESSION> 
+<RETURN_EXPRESSION>     =: <RETURN> <FUNCTION_CALL> 
+<RETURN_EXPRESSION>     =: <RETURN> <TEXTO> 
+
 <OPERATOR>           =: <BASIC_OPERATOR>
 <OPERATOR>           =: <COMPLEX_OPERATOR>
 
@@ -106,12 +116,16 @@
 <BEGIN>                         =: INICIO
 <END>                           =: FIM
 <LOOP_NAME>                     =: ENQUANTO
+<RETURN>                        =: RETORNAR
 
 <BOOLEAN>                       =: TRUE
 <BOOLEAN>                       =: FALSE
 
 <ATTRIBUITING_OPERATOR>         =: = 
+
 <COMPASISON_OPERATOR>           =: == 
+<COMPASISON_OPERATOR>           =: >
+<COMPASISON_OPERATOR>           =: <
 
 <BASIC_OPERATOR>                =: + 
 <BASIC_OPERATOR>                =: -
@@ -146,33 +160,58 @@
     multi-linha             
 */    
 
-numero a = 10;              
-texto  b = "rhuan vitor";       
-numero c = 20;                  
+numero a,b,c;              
+texto  b;       
+numero c;  
+numero z[];
 
-numero c = 20;    
+b = "rhuan victor"
+z = [1,2,3,4,5]  
+c = ((1+2)-1)          
+c = 20 + x(a,b);    
 
 numero x(texto b, numero c){
+    numero a,b,c;              
+    texto  b;       
+    numero c;  
+    numero z[];
+
+    b = "rhuan victor"
+    z = [1,2,3,4,5]  
+    c = ((1+2)-1)          
+    c = 20 + x(a,b);
+
+    ENQUANTO(x==z){
+        ENQUANTO( ((x+2)+y) == isTrue(5)  ){
+
+        }
+    }
+
+    WHILE( x()==z() ){
+
+    }
+
     retorna c;
+    retorna "RHUAN";
+    retorna ((c+b)-d);
+    retorna x(a+b);
 }
 
 INICIO
     numero a, b, c;
-    numero x = x();         
-    numero x = x(a,b);      
-    numero z = (a+b)/c;     
+    x = x();         
+    x = x(a,b);      
+    z = (a+b)/c;     
 
-    return x;               
-    return a+b;             
-    return x(); 
+    retorna x;               
+    retorna a+b;             
+    retorna x(); 
 
-    WHILE(x==z){
+    ENQUANTO(x>z){
 
     }
 
-    funcao(a,b,c);
-
-    x + funcao_y() / 10;            
+    funcao(a,b,c);            
 FIM
 
 
@@ -182,6 +221,3 @@ FIM
 - COLORIR
 - fazer BOOLEAN
 - tratar questao do numero negativo com operador
-- CRIAR LOOP E IMPEDIR QUE POSSA ESTAR DENTRO DO INIT_PROGRAM  
-    - GARANTIR QUE LOOP SOH ESTA DENTRO DA FUNCAO OU MAIN PROGRAM
-- FAZER ARRAY DECLARATION
