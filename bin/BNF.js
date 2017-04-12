@@ -2,32 +2,11 @@ function BNF(){
 
     this.dictionary = {};
 
-    function isWhiteSpace(char){
-        return (char.charCodeAt(0) == 160 || char.charCodeAt(0) == 32);
+    function isToSkip(char){
+        return ( char.charCodeAt(0) == 160 || char.charCodeAt(0) == 32 || char == "=" );
     }
 
-    this.loadBNF = function( codeFile ) {
-        this.dictionary = new Dictionary();
-
-        for( var i = 0 ; i < codeFile.rowsCount() ; i++ ) {
-
-            var row = codeFile.rowAt(i);
-            var rowSplit = row.text.split(" = ");
-            var leftTerm = rowSplit[0];
-            var rightTerm = rowSplit[1];
-
-            
-            for (var j = 0 ; j < row.length()-1 ; j++ ) {
-            
-               
-                    
-                }       
-             } // END FOR -> colunas
-            this.dictionary.addRule(leftTerm, rightTerms);
-        } // END FOR -> linhas
-    } // END function loadBNF
-    /*
-    this.loadBNF = function( codeFile ) {
+   this.loadBNF = function( codeFile ) {
         this.dictionary = new Dictionary();
 
         for( var i = 0 ; i < codeFile.rowsCount() ; i++ ) {
@@ -43,7 +22,7 @@ function BNF(){
                 
                 // <PROGRAM>       = <INIT_PROGRAM> <MAIN_PROGRAM> 
                 // se NAO for espaço em branco ou IGUAL
-                if ( !( isWhiteSpace(char) || char=="=" ) ) {
+                if ( !isToSkip(char) ) {
                     
                     if ( char == "<" ){
 
@@ -70,7 +49,7 @@ function BNF(){
             this.dictionary.addRule(leftTerm, rightTerms);
         } // END FOR -> linhas
     } // END function loadBNF
-    */
+    
 } //END CLASS BNF
 
 function Dictionary(){

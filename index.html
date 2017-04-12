@@ -31,14 +31,16 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             </button>
-                <a class="navbar-brand" href="index.html">JavaScript Compiler FFB</a>
+                <a class="navbar-brand" >
+                    <input type='file' name="loadBNF" alt="loadBNF" onchange='openFile(event)'>
+                </a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
 
                     <button id="runButton" class="btn btn-primary navbar-btn">
                     <span class="glyphicon glyphicon glyphicon-play"></span>  
-                    RUN  
+                    RUN   
                 </button>
 
                     <button class="btn btn-warning navbar-btn">
@@ -51,20 +53,52 @@
                     STOP  
                 </button>
 
-
+    
                 </ul>
             </div>
             <!--/.nav-collapse -->
         </div>
     </nav>
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12" id="codeArea">                
-                <div class="row line">
-                    <div class="col number">1</div>
-                    <div class="col-xs-11 text" contenteditable="true">//your code here</div>
-                </div>                 
+    <div class="container-fluid height-full">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#CODE">CODE</a></li>            
+            <li><a data-toggle="tab" href="#BNF">BNF</a></li>
+            <li><a data-toggle="tab" href="#menu3">Menu 3</a></li>
+        </ul>
+        <div id="IDE" class="tab-content">
+            <div id="CODE" class="tab-pane fade in active codeArea">                
+                <div class="codeRow">
+                    <div class="col-xs-1  codeNumber"> 1 </div>
+                    <div class="col-xs-11 codeText" contenteditable="true">//your code here 1</div>  
+                </div>  
+                <div class="codeRow">
+                    <div class="col-xs-1  codeNumber"> 2 </div>
+                    <div class="col-xs-11 codeText" contenteditable="true">//your code here 2</div>  
+                </div>
+                <div class="codeRow">
+                    <div class="col-xs-1  codeNumber"> 3 </div>
+                    <div class="col-xs-11 codeText" contenteditable="true">//your code here 3</div>  
+                </div>               
             </div>
+            <div id="BNF" class="tab-pane fade codeArea">
+                <div class="codeRow">
+                    <div class="col-xs-1  codeNumber"> 1 </div>
+                    <div class="col-xs-11 codeText" contenteditable="true"> PROGRAM       = INIT_PROGRAMMAIN_PROGRAM  </div>  
+                </div>
+                <div class="codeRow">
+                    <div class="col-xs-1  codeNumber"> 2 </div>
+                    <div class="col-xs-11 codeText" contenteditable="true"> </div>  
+                </div>
+                <div class="codeRow">
+                    <div class="col-xs-1  codeNumber"> 3 </div>
+                    <div class="col-xs-11 codeText" contenteditable="true"> INIT_PROGRAM  = INIT_PROGRAM INIT_PROGRAM </div>  
+                </div>
+            </div>
+            <div id="menu3" class="tab-pane fade">
+            
+            </div>
+        </div>
+          
     </div>
     <!--jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

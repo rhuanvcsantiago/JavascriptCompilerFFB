@@ -1,79 +1,65 @@
-
-/*
-
-   
-    # TODO
-       - IMPLEMENTAR FUNCAO DELETE
-       - ORGANIZAR IDE EM UMA CLASSE
- 
-
-*/
-
-
 var compiler = new Compiler();
-var CODE_AREA = $("#codeArea");
-var RUN_BUTTON = $("#runButton");
 
-function insertRowBelow(currentRowNumber, currentRowText) {
+function insertRowBelow(currentCodeRowObject, rowText) {
 
-    newRowNumber = currentRowNumber + 1; // a linha abaixo sempre é a linha atual + 1;
-    newRowText = currentRowText || ""; // seta um valor default, caso currentRowText seja undefined;
+    newRowText = rowText || ""; 
 
-    // cria o texto html
-    newRowHTMLText = createRowText(newRowNumber, newRowText);
+    newRowHTMLText = createRowText(newRowText);
 
-    // insere html da newRow no INDICE(retirar 1 da rowNumber) abaixo da linha atual(rowNumber)
-    CODE_AREA.children().eq(currentRowNumber - 1).after(newRowHTMLText);
+    currentCodeRowObject.after( newRowHTMLText );
 
-    //muda o foco para a linha inserida
-    CODE_AREA.children().eq(currentRowNumber).children().eq(1).focus();
+    currentCodeRowObject.next().children(".codeText").focus();
 
-    // verifica se a linha inserida não era a última
-    if (newRowNumber < countRows()) {
-        // atualiza o número das proximas linhas.
-        updateRowNumbersBelow(newRowNumber);
-    }
-
-
+    updateRowNumbers( currentCodeRowObject.parent() );
+   
 }
 
-function removeCurrentRow(currentRowNumber, currentRowText){
+function removeRow(currentCodeRowObject, rowStringToMove){
 
-    var currentRowIndex = currentRowNumber-1;
-    var rowAbove = CODE_AREA.children().eq(currentRowIndex-1).children();   
-    var rowAboveTextLength = rowAbove.eq(1).text().length;
+    var prevCodeRowObject     = currentCodeRowObject.prev();
+    var prevCodeRowTextObject = prevCodeRowObject.children(".codeText");
+    var prevCodeRowText       = prevCodeRowTextObject.text();
+    
+    prevCodeRowTextObject.text(prevCodeRowText + rowStringToMove);
 
-    CODE_AREA.children().eq(currentRowIndex).remove();
-           
-    if (currentRowText != "" ){
-        CODE_AREA.children().eq(currentRowIndex-1).children().eq(1).append(currentRowText);
-    }
+    currentCodeRowObject.remove();
 
-    // atualiza o número das proximas linhas.
-    updateRowNumbersBelow(currentRowIndex);
+    updateRowNumbers( prevCodeRowObject.parent() );
 
-     //muda o foco para a linha de cima
-    CODE_AREA.children().eq(currentRowIndex-1).children().eq(1).focus();
-    placeCaretAt( CODE_AREA.children().eq(currentRowIndex-1).children().get(1), rowAboveTextLength );
+    prevCodeRowTextObject.focus();
+    placeCaretAt( prevCodeRowTextObject.get(0), prevCodeRowText.length );
     
 }
 
-function createRowText(lineNumber, lineContent) {
-    return '<div class="row line"><div class="col number">' + lineNumber + '</div><div class="col-xs-11 text" contenteditable="true">' + lineContent + '</div></div>';
-}
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
 
-function updateRowNumbersBelow(currentRow) {
-    var rowsCount = countRows();
-
-    for (var i = currentRow; i < rowsCount; i++) {
-        currentRow++;
-        CODE_AREA.children().eq(i).children().eq(0).text(currentRow);
-    }
-}
-
-function getAllCode(){   
+function createRowText( rowText ) {
     var string = "";
-    $(".text").each(function(){
+    string += '<div class="codeRow">';
+    string +=       '<div class="col-xs-1  codeNumber"> 1 </div>';
+    string +=       '<div class="col-xs-11 codeText" contenteditable="true">' + escapeHtml(rowText) + '</div>';  
+    string +=  '</div>';
+    return string;
+}
+
+function updateRowNumbers( codeFile ) {
+
+    codeFile.find(".codeNumber").each( function( index ) {
+        $( this ).text(index+1) ;
+    });
+   
+}
+
+function codeToString(){   
+    var string = "";
+    $("#CODE .codeText").each(function(){
         string += $( this ).text() + "\n";
     })
     return string;   
@@ -82,10 +68,10 @@ function getAllCode(){
 function toCodeObject(){
     var code = new CodeFile;
 
-    $(".row.line").each(function(){
+    $("#CODE .codeText").each(function( index ){
 
-        var number  = $( $( this ).children()[0] ).text();
-        var text    = $( $( this ).children()[1] ).text();
+        var number  = index+1;
+        var text    = $(this).text();
 
         code.pushRow(number, text + '\n');
     })
@@ -100,7 +86,7 @@ function countRows() {
 function placeCaretAt(node, position) {    
     node.focus();
     var textNode = node.firstChild;
-    var caret = position; // insert caret after the 10th character say
+    var caret = position; 
     var range = document.createRange();
     range.setStart(textNode, caret);
     range.setEnd(textNode, caret);
@@ -109,20 +95,39 @@ function placeCaretAt(node, position) {
     sel.addRange(range);
 }
 
+function placeCaretAt2(elem, position) {    
+    if(elem != null) {
+        if(elem.createTextRange) {
+            var range = elem.createTextRange();
+            range.move('character', caretPos);
+            range.select();
+        }
+        else {
+            if(elem.selectionStart) {
+                elem.focus();
+                elem.setSelectionRange(caretPos, caretPos);
+            }
+            else
+                elem.focus();
+        }
+    }
+}
 
-CODE_AREA.on("keydown", "div.col-xs-11.text", function (e) {
+$("#IDE").on("keydown", ".codeText", function (e) {
 
     //objects
-    
-    var rowObject = $(this).parent();
-    var rowTextObject = $(this);
-    var rowNumberObject = $(rowObject.children()[0]);
-    var codeFile = $(rowObject).parent()
-
+    var codeFile            = $(codeRowObject).parent()
+    var codeRowObject       = $(this).parent();
+    var codeRowTextObject   = $(this);
+    var codeRowNumberObject = $(this).prev(); 
+   
     // usefull values
-    var rowNumber = Number(rowNumberObject.text());
-    var rowTextLength = rowTextObject.text().length;
-    var rowPositionClick = window.getSelection().getRangeAt(0).startOffset;
+    var rowNumber = Number(codeRowNumberObject.text());
+    var rowTextLength = codeRowTextObject.text().length;
+    var caretPosition = window.getSelection().getRangeAt(0).startOffset;
+
+    var selectionStartPosition = window.getSelection().getRangeAt(0).startOffset;
+    var selectionEndPosition   = window.getSelection().getRangeAt(0).endOffset;
 
     // temp values
     var rowStringToStay;
@@ -132,101 +137,121 @@ CODE_AREA.on("keydown", "div.col-xs-11.text", function (e) {
     //if (e.keyCode ===  9) {} 
 
     //BACKSPACE 
-    if (e.keyCode === 8) {
+    if ( e.keyCode === 8 ) {
         // se tiver no inicio da linha
-        if (rowPositionClick === 0){
+        if ( caretPosition === 0 ){
             // nao remove a primeira linha
-            if(rowNumber=== 1)
+            if( rowNumber === 1 )
                 return false;
             // se tiver algum conteúdo na linha
-            if(rowTextLength>0){
+            if( rowTextLength > 0 ){
                //pega conteudo da linha 
-               rowStringToMove = rowTextObject.text();        
+               rowStringToMove = codeRowTextObject.text();        
             }
             
-            removeCurrentRow(rowNumber, rowStringToMove);
+            removeRow(codeRowObject, rowStringToMove);
             return false;
         }
+    }
+    //ENTER
+    if (e.keyCode === 13) {
+        //se o enter nao foi no final da linha, ou seja, tinha conteudo depois do local do enter
+        if (caretPosition < rowTextLength) {
+            // pegar conteúdo
+            rowStringToStay = codeRowTextObject.text().substring(0, caretPosition);
+            rowStringToMove = codeRowTextObject.text().substring(caretPosition, rowTextLength)
 
+            // excluir conteúdo restante da linha
+            codeRowTextObject.text(rowStringToStay);
+        }
+        // criar nova linha
+        insertRowBelow(codeRowObject, rowStringToMove);
+        // changeFocusToNewRow();
+        return false;       
     }
 
     //  UP ARROW
     if (e.keyCode === 38) { 
+        if( rowNumber === 1 )
+            return false;
 
+        var prevCodeRowObject     = codeRowObject.prev();
+        var prevCodeRowTextObject = prevCodeRowObject.children(".codeText");
+        var prevCodeRowTextLength = prevCodeRowTextObject.text().length;
+        var positionToGo = 0;
+
+        if( caretPosition >= prevCodeRowTextLength){
+            positionToGo = prevCodeRowTextLength;
+        } else if( caretPosition < prevCodeRowTextLength ) {
+            positionToGo = caretPosition;
+        } 
         
-
-        var prevRow = $(rowObject.prev().children()[1]);
-       // var prevRowLength = prevRow.text().length;
-     //   var positionToGo = 0;
-
-       // if( rowPositionClick >= prevRowLength){
-     //       positionToGo = prevRowLength;
-     //   } else if( rowPositionClick < prevRowLength ) {
-    //        positionToGo = rowPositionClick;
-    //    } 
-
-
-        prevRow.focus();       
-       
-        //prevRow.get().setSelectionRange(positionToGo, positionToGo);
-
+        placeCaretAt( prevCodeRowTextObject.get(0), positionToGo );
     }
     //  DOWN ARROW
     if (e.keyCode === 40) {
-         var nextRow = $(rowObject.next().children()[1]);
-         nextRow.focus();
-       
+         codeRowObject.next().children(".codeText").focus();
+         placeCaretAt( codeRowObject.next().children(".codeText").get(0), caretPosition );
+
     }
-    
-    //ENTER
-    if (e.keyCode === 13) {
-        //se o enter nao foi no final da linha, ou seja, tinha conteudo depois do local do enter
-        if (rowPositionClick < rowTextLength) {
-            // pegar conteúdo
-            rowStringToStay = rowTextObject.text().substring(0, rowPositionClick);
-            rowStringToMove = rowTextObject.text().substring(rowPositionClick, rowTextLength)
-
-            // excluir conteúdo restante da linha
-            rowTextObject.text(rowStringToStay);
-        }
-        // criar nova linha
-        insertRowBelow(rowNumber, rowStringToMove);
-        // changeFocusToNewRow();
-        return false;       
-    } 
+     
 });
 
-CODE_AREA.on("focus", "div.col-xs-11.text", function (e) {    
-    $(this).text( $(this).text() );              
+$("#IDE").on("focus", ".codeText", function (e) {    
+    //$(this).text( $(this).text() );              
 });
 
-CODE_AREA.on("keyup", "div.col-xs-11.text", function (e) {    
+$("#IDE").on("keyup", ".codeText", function (e) {    
     compiler.codeFile = toCodeObject();
     compiler.runOnKeyUp();             
 });
 
-CODE_AREA.on("focusout", "div.col-xs-11.text", function (e) {    
+$("#IDE").on("focusout", ".codeText", function (e) {    
     // formating text
     // console.log($(this).text());              
 });
 
-RUN_BUTTON.click( function(){ 
-    compiler.codeFile = toCodeObject();
-    compiler.runOnButtonPlay(); 
+$("#runButton").click( function(){ 
+    //compiler.codeFile = toCodeObject();
+    //compiler.runOnButtonPlay(); 
 });
 
-function setCaretPosition(elem, caretPos) {
-    if(elem.createTextRange) {
-        var range = elem.createTextRange();
-        range.move('character', caretPos);
-        range.select();
-    }
-    else {
-        if(elem.selectionStart) {
-            elem.focus();
-            elem.setSelectionRange(caretPos, caretPos);
+var openFile = function(event) {
+    var input = event.target;
+
+    var reader = new FileReader();
+
+    reader.onload = function(){
+        
+        $("#BNF").empty();
+        
+        var text = reader.result;
+        var row = "";
+
+        for (var i = 0; i < text.length; i++) {
+            var char = text[i];            
+
+            if( char == "\n" ){
+                $("#BNF").append( createRowText(row) );
+                updateRowNumbers( $("#BNF") );
+                row = "";
+            }
+
+            row += char;
         }
-        else
-            elem.focus();
     }
-}
+
+    reader.readAsText(input.files[0]);
+};
+
+//loadBNF();
+
+
+
+
+
+
+
+
+
+

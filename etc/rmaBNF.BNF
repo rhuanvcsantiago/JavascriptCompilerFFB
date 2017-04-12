@@ -1,6 +1,3 @@
-
-=============== B N F ==============
-
 <PROGRAM>       = <INIT_PROGRAM> <MAIN_PROGRAM> 
 
 <INIT_PROGRAM>  = <INIT_PROGRAM> <INIT_PROGRAM>
