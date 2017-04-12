@@ -2,35 +2,82 @@ function BNF(){
 
     this.dictionary = {};
 
-    this.load = function(){
+    function isWhiteSpace(char){
+        return (char.charCodeAt(0) == 160 || char.charCodeAt(0) == 32);
+    }
+
+    this.loadBNF = function( codeFile ) {
         this.dictionary = new Dictionary();
-    }
 
-    this.rule = function(ruleName){
-        return this.dictionary.rule(ruleName);
-    }
+        for( var i = 0 ; i < codeFile.rowsCount() ; i++ ) {
 
-    this.rules = function(){
-        return this.dictionary.rules();
-    }
+            var row = codeFile.rowAt(i);
+            var rowSplit = row.text.split(" = ");
+            var leftTerm = rowSplit[0];
+            var rightTerm = rowSplit[1];
 
-    this.term = function(term){
-        return this.dictionary.terms.get(term);
-    }
+            
+            for (var j = 0 ; j < row.length()-1 ; j++ ) {
+            
+               
+                    
+                }       
+             } // END FOR -> colunas
+            this.dictionary.addRule(leftTerm, rightTerms);
+        } // END FOR -> linhas
+    } // END function loadBNF
+    /*
+    this.loadBNF = function( codeFile ) {
+        this.dictionary = new Dictionary();
 
-    this.terms = function(){
-        return Object.values(this.dictionary.terms.array);
-    }
+        for( var i = 0 ; i < codeFile.rowsCount() ; i++ ) {
 
-  
+            var leftTerm = "";
+            var rightTerms = [];
+            var row = codeFile.rowAt(i);
+            
+            for (var j = 0 ; j < row.length()-1 ; j++ ) {
+            
+                var char = codeFile.rowAt(i).colAt(j);
+                var temp_string = "";
+                
+                // <PROGRAM>       = <INIT_PROGRAM> <MAIN_PROGRAM> 
+                // se NAO for espaço em branco ou IGUAL
+                if ( !( isWhiteSpace(char) || char=="=" ) ) {
+                    
+                    if ( char == "<" ){
 
-}
+                        j++;
+                        while( char != ">" ){
+                            temp_string += codeFile.rowAt(i).colAt(j);
+                        }
+
+                        if ( leftTerm == "" ) {
+                            leftTerm = temp_string;
+                        } else { 
+                            rightTerms.push(temp_string);
+                        }    
+                    } else {
+
+                        while( !isWhiteSpace(char) ){
+                            temp_string += codeFile.rowAt(i).colAt(j);
+                        }
+
+                        rightTerms.push(temp_string);
+                    }
+                } // END IF -> se for espaço em branco, pula.       
+             } // END FOR -> colunas
+            this.dictionary.addRule(leftTerm, rightTerms);
+        } // END FOR -> linhas
+    } // END function loadBNF
+    */
+} //END CLASS BNF
 
 function Dictionary(){
-    this.terms    = new Terms();
-    var rules    = {};
+    this.terms    = {};
+    this.rules    = {};
 
-    this.add = function(nonTerminal, termsArray){
+    this.addRule = function(nonTerminal, termsArray){
        
         if ( !this.rules[nonTerminal] )
             this.rules[nonTerminal] = [];
@@ -39,22 +86,18 @@ function Dictionary(){
 
     }
 
-    this.rule = function(ruleName){
+    this.getRule = function(ruleName){
         if( this.rules[ruleName] )
             return this.rules[ruleName];
         return false;    
     }    
 
-}
-
-function Terms(){
-    var array = {}; 
-   
-    this.get = function(symbol){
-        return array[symbol] || false;
+    /*
+    this.getTerm = function(term){
+        return terms[term] || false;
     }
 
-    this.add = function(symbol){
+    this.addTerm = function(symbol){
          if ( !array[symbol.value] )
             array[symbol.value] = symbol;
     }
@@ -84,9 +127,11 @@ function Terms(){
             return true;
         return  false;
     }
+    */
+
 }
 
-function Symbol(){
+function Term(){
     this.type   = "";
     this.value  = "";
 
