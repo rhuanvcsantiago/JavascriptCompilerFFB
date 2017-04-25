@@ -2,8 +2,20 @@ function Analex(){
 
     this.symbolsTable = new SymbolsTable(); //Array Tokens
 	this.error = [];
+	this.tokenCode = "";
+
     
+	this.pushSymbol = function(token,classe,position){
+
+		if( classe != "comentario" && classe != "comentario_multilinha" )
+			this.tokenCode += "<"+classe+">";
+
+		this.symbolsTable.push( token,classe,position );
+		
+	}
+
     this.tokenizer = function(codeFile){
+		this.tokenCode = "";
 		this.error = [];
 		this.symbolsTable.clean();
         
@@ -62,7 +74,7 @@ function Analex(){
 																					
 				if(classe_anterior=="string"){
 					if(classe == "string") {
-						this.symbolsTable.push(token,"string",posicao);
+						this.pushSymbol(token,"string",posicao);
 						classe_anterior = "";
 						token = "";
 					} else if (classe=="nova_linha") {						
@@ -73,12 +85,12 @@ function Analex(){
 					}
 				} else if(classe_anterior=="operacao2") { /* /" /a /1 /  /; /"\n" /* // */
 					if(classe == "char" || classe == "numero" || classe == "espaco") {
-						this.symbolsTable.push(token.substr(0,token.length-1),"divisao",posicao);
+						this.pushSymbol(token.substr(0,token.length-1),"divisao",posicao);
 						classe_anterior = "";
 						token = "";
 						j--;
 					} else if (classe == "operacao2") {
-						this.symbolsTable.push(token,"comentario",posicao);
+						this.pushSymbol(token,"comentario",posicao);
 						token = "";						
 						classe_anterior = "";
 						break;
@@ -106,7 +118,7 @@ function Analex(){
 							var char3 = codeFile.row(i).col(j+1);													
 							var multinhaInvertido = char2+char3;
 							if( multinhaInvertido == "*/" ) {
-								this.symbolsTable.push(token,"comentarioML",posicao);
+								this.pushSymbol(token,"comentarioML",posicao);
 								token = "";								
 								classe_anterior = "";
 								j++;
@@ -129,7 +141,7 @@ function Analex(){
 				} else if(classe_anterior=="numero") { 
 					/* CONDICOES QUEBRA: 1+ 1/ 1* 1= 1- 1 1; 1) 1]*/
 					if(classe=="operacao1" || classe == "operacao2" || classe == "operacao3" || classe == "operacao4" || classe == "separador" || classe == "ponto_e_virgula" ||  classe == "espaco")  {
-						this.symbolsTable.push(token.substr(0,token.length-1),"numero",posicao);
+						this.pushSymbol(token.substr(0,token.length-1),"numero",posicao);
 						classe_anterior = "";
 						token = "";
 						j--;
@@ -160,28 +172,28 @@ function Analex(){
 					/* QUEBRAS: a<operador> | a<separador> | a<espaco> | a<ponto_e_virgula>
 					   NAO PODE: a<string> | a<ponto> | a<nova_linha>  */
 					   if( /boolean\s|char\s|string\s|class\s|double\s|new\s|return\s/i.test(token)) {
-							this.symbolsTable.push(token.substr(0,token.length-1),"palavra_reservada_c_espaco",posicao);
+							this.pushSymbol(token.substr(0,token.length-1),"palavra_reservada_c_espaco",posicao);
 							classe_anterior = "";
 							token = "";
 							j--;
 							continue;
 					   } else if((classe == 'espaco' || classe == 'ponto_e_virgula') 
 					    			&& /(break|continue|true|false)(;|\s)/i.test(token)){
-							this.symbolsTable.push(token.substr(0,token.length-1),"palavra_reservada",posicao);
+							this.pushSymbol(token.substr(0,token.length-1),"palavra_reservada",posicao);
 							classe_anterior = "";
 							token = "";
 							j--;
 							continue;
 					   } else if((classe == 'espaco' || classe == 'separador') &&
 					   				/(else|if|while)(\s|\{|\}|\[|\]|\(|\))/i.test(token) ) {
-							this.symbolsTable.push(token.substr(0,token.length-1),"palavra_reservada",posicao);
+							this.pushSymbol(token.substr(0,token.length-1),"palavra_reservada",posicao);
 							classe_anterior = "";
 							token = "";
 							j--;
 							continue;
 					   }
 					if (classe == "espaco" || classe == "separador" || classe=="operacao1" || classe == "operacao2" || classe == "operacao3" || classe == "operacao4" || classe == "ponto_e_virgula") {
-							this.symbolsTable.push(token.substr(0,token.length-1),"identificador",posicao);
+							this.pushSymbol(token.substr(0,token.length-1),"identificador",posicao);
 							classe_anterior = "";
 							token = "";
 							j--;
@@ -197,7 +209,7 @@ function Analex(){
 					NAO PODE: +<string> +<operacao4> +<ponto_e_virgula> +<nova_linha> +<ponto>
 					*/
 					if (classe == "char" || classe == "numero" || classe=="espaco" || classe == "separador") {
-						this.symbolsTable.push(token.substr(0,token.length-1),classe_anterior,posicao);
+						this.pushSymbol(token.substr(0,token.length-1),classe_anterior,posicao);
 						classe_anterior = "";
 						token = "";
 						j--;
@@ -214,7 +226,7 @@ function Analex(){
 					NAO PODE:  =<operacao1,2,4> =<ponto_e_virgula> =<nova_linha> =<ponto>
 					*/
 					if (classe == "char" || classe == "numero" || classe=="espaco" || classe == "separador" || classe == "string") {
-						this.symbolsTable.push(token.substr(0,token.length-1),classe_anterior,posicao);
+						this.pushSymbol(token.substr(0,token.length-1),classe_anterior,posicao);
 						classe_anterior = "";
 						token = "";
 						j--;
@@ -225,12 +237,12 @@ function Analex(){
 						break;
 					}
 				} else if(classe_anterior=="separador") {
-					this.symbolsTable.push(token.substr(0,token.length-1),"separador",posicao);
+					this.pushSymbol(token.substr(0,token.length-1),"separador",posicao);
 					classe_anterior = "";
 					token = "";
 					j--;
 				} else if(classe_anterior=="ponto_e_virgula") {
-					this.symbolsTable.push(token.substr(0,token.length-1),"ponto_e_virgula",posicao);
+					this.pushSymbol(token.substr(0,token.length-1),"ponto_e_virgula",posicao);
 					classe_anterior = "";
 					token = "";
 					j--;
@@ -284,6 +296,7 @@ function SymbolsTable(){
 			this.array[token]["positions"] = [];
 
 		this.array[token]["positions"].push(position);
+		
 	}
 
 	this.clean = function clean(){

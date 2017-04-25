@@ -22,7 +22,7 @@ function CodeRow(n, t){
     }  
 
     this.isEmpty = function(){
-        if (this.length() == 0)
+        if (this.length() == 0 || ( (this.length() == 1) && (this.colAt[0]=="\n") ) )
             return true;
         else
             return false; 

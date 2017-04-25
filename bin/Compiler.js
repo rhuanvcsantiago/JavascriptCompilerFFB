@@ -1,9 +1,10 @@
 function Compiler(){
 
-    this.codeFile = new CodeFile(); //nova modelagem -> pode ser um array de arquivos -> abre possibilidade
-    this.analex   = new Analex();
-    this.anasint  = new Anasint();
+    this.codeFile  = new CodeFile(); //nova modelagem -> pode ser um array de arquivos -> abre possibilidade
+    this.anaLex    = new Analex();
+    this.anaSint   = new Anasint();
     
+
     // Function witch runs evetime a Key is pressed.
     this.runOnKeyUp = function(){
 
@@ -59,18 +60,24 @@ function Compiler(){
 
         console.clear();
         console.log("%c==============================\n===========  DEBUG ===========\n==============================", "background: black; color: white; font-size: 20px; display: block;")
+       
         logBonitinho("Código Lido:", "info");
         logBonitinho( this.codeFile.toString(), "data" );
-        logBonitinho("Executando Analex...", "info");
+       
+        logBonitinho("Executando anaLex...", "info");
         console.time();
-
-        this.analex.tokenizer(this.codeFile);
-        
+        this.anaLex.tokenCode == "";
+        this.anaLex.tokenizer(this.codeFile);
         console.timeEnd("Tempo de execução:");
+
+        logBonitinho("Token Código Interpretado:", "info");
+        logBonitinho( this.anaLex.tokenCode, "data" );
+        
         logBonitinho("Tabela de Simbolos:", "info");
-        printSymbolsTable(this.analex.symbolsTable);
+        printSymbolsTable(this.anaLex.symbolsTable);
+        
         logBonitinho("Array de Erros:", "info");
-        printError(this.analex.error);
+        printError(this.anaLex.error);
 
 
 

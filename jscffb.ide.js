@@ -65,10 +65,10 @@ function codeToString(){
     return string;   
 }
 
-function toCodeObject(){
+function toCodeObject(context){
     var code = new CodeFile;
 
-    $("#CODE .codeText").each(function( index ){
+    context.find(".codeText").each(function( index ){
 
         var number  = index+1;
         var text    = $(this).text();
@@ -201,9 +201,20 @@ $("#IDE").on("focus", ".codeText", function (e) {
     //$(this).text( $(this).text() );              
 });
 
-$("#IDE").on("keyup", ".codeText", function (e) {    
-    compiler.codeFile = toCodeObject();
-    compiler.runOnKeyUp();             
+$("#IDE").on("keyup", ".codeText", function (e) {  
+    
+    var context     = $(this).parent().parent();
+    var codeFile    = toCodeObject( context );  
+    
+    if( context.attr("id") == "CODE" ){
+        compiler.codeFile = codeFile;
+        
+    } else if ( context.attr("id") == "BNF" ) {
+        compiler.anaSint.readBNF(codeFile);
+    }
+
+    compiler.runOnKeyUp();
+                 
 });
 
 $("#IDE").on("focusout", ".codeText", function (e) {    
