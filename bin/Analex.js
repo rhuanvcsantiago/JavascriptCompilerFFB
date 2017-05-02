@@ -6,8 +6,31 @@ function Analex(){
 
     
 	this.pushSymbol = function(token,classe,position){
+		if(classe == "separador") {
+			if(token == '(') {
+				classe = 'PRIMARY_SEPARATOR_OPEN';
+			}
+			if(token == ')') {
+				classe = 'PRIMARY_SEPARATOR_CLOSE';
+			}
+			if(token == '[') {
+				classe = 'ARRAY_SEPARATOR_OPEN';
+			}
+			if(token == ']') {
+				classe = 'ARRAY_SEPARATOR_CLOSE';
+			}
+			if(token == '{') {
+				classe = 'CONTEXT_SEPARATOR_OPEN';
+			}
+			if(token == '}') {
+				classe = 'CONTEXT_SEPARATOR_CLOSE';
+			}
+			if(token == ',') {
+				classe = 'VARIABLE_SEPARATOR';
+			}
+		}
 
-		if( classe != "comentario" && classe != "comentario_multilinha" )
+		if( classe != "COMMENT" )
 			this.tokenCode += "<"+classe+">";
 
 		this.symbolsTable.push( token,classe,position );
@@ -74,7 +97,7 @@ function Analex(){
 																					
 				if(classe_anterior=="string"){
 					if(classe == "string") {
-						this.pushSymbol(token,"string",posicao);
+						this.pushSymbol(token,"TEXT",posicao);
 						classe_anterior = "";
 						token = "";
 					} else if (classe=="nova_linha") {						
@@ -85,12 +108,12 @@ function Analex(){
 					}
 				} else if(classe_anterior=="operacao2") { /* /" /a /1 /  /; /"\n" /* // */
 					if(classe == "char" || classe == "numero" || classe == "espaco") {
-						this.pushSymbol(token.substr(0,token.length-1),"divisao",posicao);
+						this.pushSymbol(token.substr(0,token.length-1),"COMPLEX_OPERATOR",posicao);
 						classe_anterior = "";
 						token = "";
 						j--;
 					} else if (classe == "operacao2") {
-						this.pushSymbol(token,"comentario",posicao);
+						this.pushSymbol(token,"COMMENT",posicao);
 						token = "";						
 						classe_anterior = "";
 						break;
@@ -118,7 +141,7 @@ function Analex(){
 							var char3 = codeFile.row(i).col(j+1);													
 							var multinhaInvertido = char2+char3;
 							if( multinhaInvertido == "*/" ) {
-								this.pushSymbol(token,"comentarioML",posicao);
+								this.pushSymbol(token,"COMMENT",posicao);
 								token = "";								
 								classe_anterior = "";
 								j++;
@@ -141,7 +164,7 @@ function Analex(){
 				} else if(classe_anterior=="numero") { 
 					/* CONDICOES QUEBRA: 1+ 1/ 1* 1= 1- 1 1; 1) 1]*/
 					if(classe=="operacao1" || classe == "operacao2" || classe == "operacao3" || classe == "operacao4" || classe == "separador" || classe == "ponto_e_virgula" ||  classe == "espaco")  {
-						this.pushSymbol(token.substr(0,token.length-1),"numero",posicao);
+						this.pushSymbol(token.substr(0,token.length-1),"NUMBER",posicao);
 						classe_anterior = "";
 						token = "";
 						j--;
@@ -171,29 +194,54 @@ function Analex(){
 				} else if(classe_anterior=="char") { 
 					/* QUEBRAS: a<operador> | a<separador> | a<espaco> | a<ponto_e_virgula>
 					   NAO PODE: a<string> | a<ponto> | a<nova_linha>  */
-					   if( /boolean\s|char\s|string\s|class\s|double\s|new\s|return\s/i.test(token)) {
-							this.pushSymbol(token.substr(0,token.length-1),"palavra_reservada_c_espaco",posicao);
+					   if( /INICIO\s/i.test(token)) {
+							this.pushSymbol(token.substr(0,token.length-1),"BEGIN",posicao);
 							classe_anterior = "";
 							token = "";
 							j--;
 							continue;
-					   } else if((classe == 'espaco' || classe == 'ponto_e_virgula') 
-					    			&& /(break|continue|true|false)(;|\s)/i.test(token)){
-							this.pushSymbol(token.substr(0,token.length-1),"palavra_reservada",posicao);
+					   } else if( /FIM\s/i.test(token)) {
+							this.pushSymbol(token.substr(0,token.length-1),"END",posicao);
 							classe_anterior = "";
 							token = "";
 							j--;
 							continue;
 					   } else if((classe == 'espaco' || classe == 'separador') &&
-					   				/(else|if|while)(\s|\{|\}|\[|\]|\(|\))/i.test(token) ) {
-							this.pushSymbol(token.substr(0,token.length-1),"palavra_reservada",posicao);
+					   				/(ENQUANTO)(\s|\{|\}|\[|\]|\(|\))/i.test(token) ) {
+							this.pushSymbol(token.substr(0,token.length-1),"LOOP_NAME",posicao);
+							classe_anterior = "";
+							token = "";
+							j--;
+							continue;
+					   } else if((classe == 'espaco' || classe == 'separador') &&
+					   				/(SE)(\s|\{|\}|\[|\]|\(|\))/i.test(token) ) {
+							this.pushSymbol(token.substr(0,token.length-1),"CONDITION",posicao);
+							classe_anterior = "";
+							token = "";
+							j--;
+							continue;
+					   } else if( /RETORNAR\s/i.test(token)) {
+							this.pushSymbol(token.substr(0,token.length-1),"RETURN",posicao);
+							classe_anterior = "";
+							token = "";
+							j--;
+							continue;
+					   } else if((classe == 'espaco' || classe == 'ponto_e_virgula') 
+					    			&& /(TRUE|FALSE)(;|\s)/i.test(token)){
+							this.pushSymbol(token.substr(0,token.length-1),"BOOLEAN",posicao);
+							classe_anterior = "";
+							token = "";
+							j--;
+							continue;
+					   } else if( /BOOLEAN|NUMERO|TEXTO\s/i.test(token)) {
+							this.pushSymbol(token.substr(0,token.length-1),"TYPE",posicao);
 							classe_anterior = "";
 							token = "";
 							j--;
 							continue;
 					   }
 					if (classe == "espaco" || classe == "separador" || classe=="operacao1" || classe == "operacao2" || classe == "operacao3" || classe == "operacao4" || classe == "ponto_e_virgula") {
-							this.pushSymbol(token.substr(0,token.length-1),"identificador",posicao);
+							this.pushSymbol(token.substr(0,token.length-1),"IDENTIFIER",posicao);
 							classe_anterior = "";
 							token = "";
 							j--;
@@ -209,7 +257,11 @@ function Analex(){
 					NAO PODE: +<string> +<operacao4> +<ponto_e_virgula> +<nova_linha> +<ponto>
 					*/
 					if (classe == "char" || classe == "numero" || classe=="espaco" || classe == "separador") {
-						this.pushSymbol(token.substr(0,token.length-1),classe_anterior,posicao);
+						if(classe_anterior=="operacao1") {
+							this.pushSymbol(token.substr(0,token.length-1),'BASIC_OPERATOR',posicao);	
+						} else if(classe_anterior=="operacao4"){
+							this.pushSymbol(token.substr(0,token.length-1),'COMPLEX_OPERATOR',posicao);	
+						}
 						classe_anterior = "";
 						token = "";
 						j--;
@@ -226,7 +278,11 @@ function Analex(){
 					NAO PODE:  =<operacao1,2,4> =<ponto_e_virgula> =<nova_linha> =<ponto>
 					*/
 					if (classe == "char" || classe == "numero" || classe=="espaco" || classe == "separador" || classe == "string") {
-						this.pushSymbol(token.substr(0,token.length-1),classe_anterior,posicao);
+						if(token.substr(0,token.length-1) == '=='){
+							this.pushSymbol(token.substr(0,token.length-1),'COMPASISON_OPERATOR',posicao);
+						} else {
+							this.pushSymbol(token.substr(0,token.length-1),'ATTRIBUITING_OPERATOR',posicao);
+						}						
 						classe_anterior = "";
 						token = "";
 						j--;
@@ -242,7 +298,7 @@ function Analex(){
 					token = "";
 					j--;
 				} else if(classe_anterior=="ponto_e_virgula") {
-					this.pushSymbol(token.substr(0,token.length-1),"ponto_e_virgula",posicao);
+					this.pushSymbol(token.substr(0,token.length-1),"END_LINE",posicao);
 					classe_anterior = "";
 					token = "";
 					j--;
