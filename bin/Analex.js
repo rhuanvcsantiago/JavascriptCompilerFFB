@@ -233,7 +233,7 @@ function Analex(){
 							token = "";
 							j--;
 							continue;
-					   } else if( /BOOLEAN|NUMERO|TEXTO\s/i.test(token)) {
+					   } else if( /BOOLEAN\s|NUMERO\s|TEXTO\s/i.test(token)) {
 							this.pushSymbol(token.substr(0,token.length-1),"TYPE",posicao);
 							classe_anterior = "";
 							token = "";

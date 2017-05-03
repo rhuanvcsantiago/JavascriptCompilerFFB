@@ -26,9 +26,10 @@ function Anasint(){
 
                 if ( this.BNF[leftMember] == undefined ){
                     this.BNF[leftMember] = {};
+                    this.BNF[leftMember].startSymbol = i==0;
                     this.BNF[leftMember].derivations = [];
                     this.BNF[leftMember].first = [];
-                    this.BNF[leftMember].follow = [];
+                    this.BNF[leftMember].follow = false;
                 }
 
                 this.BNF[leftMember].derivations.push( rightMembersArray );   
@@ -69,48 +70,30 @@ function Anasint(){
     }
 
     // the first nonTerminal of a brother-terminal derivation
-    this.follow = function(element){
-        //pegar o index of de cada regra
-        var firstsArray = [];
-        
-        var leftTerms = Object.keys(this.BNF)
-       
-        for( var k=0; k< leftTerms.length; k++){
+    this.calculateFollows = function(){
+        var leftTerms = Object.keys(this.BNF);
 
-            var leftTermIndex = leftTerms[k];
-            var derivations = this.BNF[leftTermIndex].derivations;
+        for(var i=0; i<leftTerms.length; i++) {
+            this.calculateFollow(leftTerms[i]);
+        }
+    }
 
-            for( var i = 0; i < derivations.length; i++ ){
-
-                var rule = derivations[i];
-                var index = rule.indexOf(element);
-            
-                if( index != -1 ) {
-                    var nextElementIndex = index+1;
-                    var nextElement = "";
-                    
-                    if( nextElementIndex >= rule.length )
-                        nextElement = "ε";
-                    else
-                        nextElement = rule[nextElementIndex];
-
-                    if( firstsArray.indexOf( nextElement ) == -1 )
-                        firstsArray.push( nextElement );  
-                }       
-            } 
+    this.calculateFollow = function(element) {
+        if(this.BNF[element].follow) {
+            return this.BNF[element].follow;
         }
 
-        for( var i = 0; i<firstsArray.length; i++ ){
-            var term = firstsArray[i];
+        this.BNF[element].follow = [];
 
-            if( this.isTerminal(term) ) {
-                this.BNF[element].follow = this.BNF[element].follow.concat( this.BNF[term].first );               
-            } else{
-                this.BNF[element].follow =  this.BNF[element].follow.concat( term );  
-            }
+        if(this.BNF[element].startSymbol) {
+            this.BNF[element].follow.push('$');
         }
 
-        //this.BNF[element].follow = firstsArray;    
+        var rules = this.BNF[element].derivations;
+        for(var rule in rules) {
+
+        }
+
     }
 
     this.generateFirstAndFollow = function(){
@@ -121,13 +104,28 @@ function Anasint(){
             this.first( leftTerms[i], leftTerms[i] );            
         };
 
-        for(var i=0; i< leftTerms.length; i++) {
-            this.follow( leftTerms[i] );            
-        };
+        this.calculateFollows();
    
     }
 
+    this.parse = function( string ){
+
+    }
+
+    this.recursive = function(){
+
+    }
+
+
     this.isTerminal = function(element) {
+        if(element[0] == "<"){
+            return true;
+        }
+
+        return false;
+    }
+
+    this.isNonTerminal = function(element) {
         if(element[0] == "<"){
             return true;
         }
