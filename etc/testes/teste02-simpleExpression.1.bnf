@@ -6,4 +6,8 @@
 <BASIC_THINGS> = <NUMBER>
 <BASIC_THINGS> = <IDENTIFIER> 
 
+<BASIC_OPERATOR> = +
+<BASIC_OPERATOR> = -
+
 // a+b;a-c; 
+
