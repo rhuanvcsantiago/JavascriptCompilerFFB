@@ -83,15 +83,30 @@ function Anasint() {
             return this.BNF[element].follow;
         }
 
-        this.BNF[element].follow = [];
+        this.BNF[element].follow = {};
 
         if (this.BNF[element].startSymbol) {
             this.BNF[element].follow.push('$');
         }
 
         var rules = this.BNF[element].derivations;
+<<<<<<< Updated upstream
         for (var rule in rules) {
+=======
+        for(var rule in rules) {
+            if(rule == "ε") {
+                this.BNF[element].follow["ε"] = true;
+                break;
+            }
 
+            var firstOfNonTerminal = this.first(rule);
+            if (!firstOfNonTerminal[EPSILON]) {
+                merge(first, firstOfNonTerminal);
+                break;
+            }
+>>>>>>> Stashed changes
+
+            merge(first, firstOfNonTerminal, [EPSILON]);
         }
 
     }
