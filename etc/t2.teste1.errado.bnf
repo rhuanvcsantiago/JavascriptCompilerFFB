@@ -1,8 +1,8 @@
-main() {
-    float a,b;
+BEGIN
+    NUMBER a,b;
     scanf(1a);
     b=a*;
-    float b;
+    NUMBER b;
     c=b-a)*2%3;
     printf((c);
-{
+END

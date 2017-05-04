@@ -83,6 +83,7 @@ function Anasint() {
         }
     }
 
+/*
     this.calculateFollow = function (element) {
         if (this.BNF[element].follow) {
             return this.BNF[element].follow;
@@ -114,7 +115,7 @@ function Anasint() {
             merge(first, firstOfNonTerminal, [EPSILON]);
         }
 
-    }
+    }*/
 
     this.generateFirstAndFollow = function () {
 

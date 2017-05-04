@@ -1,8 +1,8 @@
-main() {
-    float a,b;
+BEGIN
+    NUMBER a,b;
     scanf(a);
-    b= a*2;
-    float c;
-    c= (b-a)*2-3;
+    b = a*2;
+    NUMBER c;
+    c = (((b-a)*2)-3);
     printf(c);
-}
+END
