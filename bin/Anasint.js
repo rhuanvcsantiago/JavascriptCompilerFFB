@@ -23,7 +23,7 @@ function Anasint() {
                 var leftMember = rowTextSplit[0].trim();
                 var rightMembers = rowTextSplit[1].trim();
 
-                if( i == 1 )
+                if( i == 0 )
                     this.firstRuleName.push(leftMember);
 
                 var rightMembersArray = rightMembers.split(" ");
