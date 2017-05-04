@@ -7,11 +7,12 @@
 <T1> = <ASTERISCO> <F> <T1>
 <T1> = <ASTERISCO> <F>
 <F> = <L_P> <E> <R_P>
+<F> = <F1>
 
 <MAIS> = +
 <ASTERISCO> = *
 <L_P> = (
 <R_P> = )
-<F> = id
+<F1> = id
 
 

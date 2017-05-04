@@ -70,11 +70,16 @@
 <OPERATOR> = <BASIC_OPERATOR>
 <OPERATOR> = <COMPLEX_OPERATOR>
 
-<END_LINE> = ;
-<BEGIN> = INICIO
-<END> = FIM
-<LOOP_NAME> = ENQUANTO
-<RETURN> = RETORNAR
+<IDENTIFIER>                    = REGEX(/A...Z/)
+<NUMBER>                        = REGEX(/1...0/)                      
+
+<TEXT>                          = REGEX('(/A...Z/)')
+
+<END_LINE>                      = ;
+<BEGIN>                         = INICIO
+<END>                           = FIM
+<LOOP_NAME>                     = ENQUANTO
+<RETURN>                        = RETORNAR
 
 <BOOLEAN> = TRUE
 <BOOLEAN> = FALSE

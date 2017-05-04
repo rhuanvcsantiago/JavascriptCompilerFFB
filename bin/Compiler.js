@@ -2,7 +2,7 @@ function Compiler(){
 
     this.codeFile  = new CodeFile(); //nova modelagem -> pode ser um array de arquivos -> abre possibilidade
     this.anaLex    = new Analex();
-    this.anaSint   = new Anasint();
+    this.anaSint   = new FirstFollow();
     
 
     // Function witch runs evetime a Key is pressed.
