@@ -250,9 +250,17 @@ var openFile = function(event) {
 
             row += char;
         }
+
+        var codeFile    = toCodeObject( $("#BNF") );  
+        compiler.anaSint.readBNF(codeFile);
+        compiler.runOnKeyUp();
+
     }
 
     reader.readAsText(input.files[0]);
+
+    
+
 };
 
 //loadBNF();

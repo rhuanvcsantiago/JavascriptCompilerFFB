@@ -1,10 +1,12 @@
 function Anasint() {
 
     this.BNF = [];
+    this.firstRuleName = [];
 
     this.readBNF = function (codeFile) {
 
         this.BNF = [];
+        this.firstRuleName = [];
 
         for (var i = 0; i < codeFile.rowsCount(); i++) {
 
@@ -20,6 +22,9 @@ function Anasint() {
 
                 var leftMember = rowTextSplit[0].trim();
                 var rightMembers = rowTextSplit[1].trim();
+
+                if( i == 1 )
+                    this.firstRuleName.push(leftMember);
 
                 var rightMembersArray = rightMembers.split(" ");
                 rightMembersArray.remove("");
@@ -123,76 +128,91 @@ function Anasint() {
 
     }
 
-    this.parse = function (tokenCode, firstRule) {
+    this.parse = function (tokenCodeArray, firstRule, regrasProducaoBNF ) {
 
-        var gramatica = function (regrasProducao, stringSimboloInicial) {
+        var gram = {
+                        regrasProducao: regrasProducaoBNF,
+                        simboloInicial: firstRule,
+                   };
 
-            this.regrasProducao = regrasProducao;
-            this.simboloInicial = stringSimboloInicial;
-            this.flag = false;
-        }
+        
+        function ehSimboloNaoTerminal(simbolo, gram) {
+            
+            // se nao achar regra de producao para determinado nao terminal, 
+            // eh porque ele eh uma regra de producao de um terminal e nao consta na BNF por conta de regex
+            if(gram.regrasProducao[simbolo] == undefined)
+                return false;
 
-        function ehSimboloNaoTerminal(simbolo) {
-            if (element[0] == "<") {
+            var regraProducao = gram.regrasProducao[simbolo].derivations[0];
+            
+            // se tem mais de uma regra de producao, nao é NAO terminal.
+            if( (regraProducao[0][0] == "<") && ( regraProducao[0].length > 1 ) )
                 return true;
-            }
-
+               
             return false;
         }
 
+        function aplicarRegra(composicaoArray, regraArray, i) {
 
-        function aplicarRegra(composicao, regra, i) {
-            var primeiraParte = composicao.slice(0, i);
-            var segundaParte = composicao.slice(i + 1, composicao.length);
-            return primeiraParte + regra + segundaParte;
+            var comp = composicaoArray.slice(0);
+
+            comp.splice( i, 1, regraArray[0] );
+
+            for (var j = 1; j < regraArray.length; j++) {
+                
+                comp.splice( i+j, 0, regraArray[j] );                
+                
+            }
+            
+            return comp;
+            
         }
 
-        function procuraSimboloNaoTerminal(composicao) {
-            for (var i = 0; i < composicao.length; i++) {
-                var simbolo = composicao[i];
-                if ( ehSimboloNaoTerminal(simbolo) ) // TODO-PERFORMANCE da pra siar do loop assim que achar
+        function procuraSimboloNaoTerminal(composicaoArray, gram) {
+            for (var i = 0; i < composicaoArray.length; i++) {
+                var simbolo = composicaoArray[i];
+                if ( ehSimboloNaoTerminal(simbolo, gram) ) // TODO-PERFORMANCE da pra siar do loop assim que achar
                     return { caracter: simbolo, posicao: i };
             }
             return false;
         }
 
-        function recursao(composicao, palavra, gram) {
+        //absdbsAAAAA <$bla><PROGRAM><$bla><$bla><EXPRESSION>
+
+        function recursao(composicaoArray, tokenCodeArray, gram) {
 
             // [CONDICAO DE PARARA] 
             // tamanho da string formada, maior que a palavra informada
-            if (composicao.length > palavra.length) {
-                console.log("VALUE: FALSE \tSTATS:MAIOR \tWORD: " + composicao);
+            if ( composicaoArray.length > tokenCodeArray.length ) {
+                console.log( "VALUE: FALSE \tSTATS:MAIOR \tWORD: " + composicaoArray.join("") );
                 return false;
             }
 
             // Procura pora simbolos nãoTerminais na string composicao     
-            var simboloNaoTerminal = procuraSimboloNaoTerminal(composicao);
+            var objSimboloNaoTerminal = procuraSimboloNaoTerminal(composicaoArray, gram);
 
-            // [CONDICAO DE PARARA] 
+            // [CONDICAO DE PARADA] 
             // se não possui nenhum simbolo NãoTerminal na string composicao
-            if (!simboloNaoTerminal) {
+            if (!objSimboloNaoTerminal) {
                 // verificar se a string composicao é igual a palavra procurada
-                if (composicao == palavra) {
-                    console.log("VALUE: TRUE \tSTATS:IGUAL \tWORD: " + composicao);
-                    gram.flag = "true";
+                if ( composicaoArray.join("") == tokenCodeArray.join("") ) {
+                    console.log( "VALUE: TRUE \tSTATS:IGUAL \tWORD: " + composicaoArray.join("") );
                     return true;
                 }
-                console.log("VALUE: FALSE \tSTATS:DIFF  \tWORD: " + composicao);
+                console.log("VALUE: FALSE \tSTATS:DIFF  \tWORD: " + composicaoArray.join(""));
                 return false;
             }
 
-            var regrasProducaoSimbolo = gram.regrasProducao[simboloNaoTerminal.caracter];
+            var regrasProducaoSimbolo = gram.regrasProducao[objSimboloNaoTerminal.caracter].derivations;
             for (var i = 0; i < regrasProducaoSimbolo.length; i++) {
-                var novaComposicao = aplicarRegra(composicao, regrasProducaoSimbolo[i], simboloNaoTerminal.posicao);
-                if (recursao(novaComposicao, palavra, gram))
+                var novaComposicaoArray = aplicarRegra(composicaoArray, regrasProducaoSimbolo[i], objSimboloNaoTerminal.posicao);
+                if (recursao(novaComposicaoArray, tokenCodeArray, gram))
                     return true;
             }
             return false;
         }
 
-        var gram = new gramatica(regrasProducao, stringSimboloInicial);
-
-        return recursao(composicao, palavra.slice(), gram);
+        return recursao(firstRule, tokenCodeArray, gram);
 
     }
 

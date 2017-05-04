@@ -2,7 +2,8 @@ function Analex(){
 
     this.symbolsTable = new SymbolsTable(); //Array Tokens
 	this.error = [];
-	this.tokenCode = "";
+	this.tokenCodeArray = [];
+	//this.codeArray = [];
 
     
 	this.pushSymbol = function(token,classe,position){
@@ -30,15 +31,17 @@ function Analex(){
 			}
 		}
 
-		if( classe != "COMMENT" )
-			this.tokenCode += "<"+classe+">";
+		if( classe != "COMMENT" ){
+			this.tokenCodeArray.push("<"+classe+">");
+			//this.codeArray.push(token);
+		}
 
-		this.symbolsTable.push( token,classe,position );
+		this.symbolsTable.push(token,"<"+classe+">", position);
 		
 	}
 
     this.tokenizer = function(codeFile){
-		this.tokenCode = "";
+		this.tokenCodeArray = [];
 		this.error = [];
 		this.symbolsTable.clean();
         
