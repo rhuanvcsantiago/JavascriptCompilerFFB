@@ -2,6 +2,7 @@ function FirstFollow() {
     var EPSILON = "ε";
     this.BNF = [];
     this.startSymbol = null;
+    this.error = []
 
     this.readBNF = function (codeFile) {
 
@@ -191,8 +192,43 @@ function FirstFollow() {
         this.buildFollowSets();
     }
 
-    this.parser = function(){
+    this.predictSetTable = function() {
+        var keys = Object.keys(this.BNF);
+        var terminalSymbols = [];
+        var nonTerminalSymbols = [];
+        for (var k = 0; k < keys.length; k++) {
+            var key = key[k];
+            if(this.BNF[key].terminal) {
+                terminalSymbols.push(key);
+            } else {
+                nonTerminalSymbols.push(key);
+            }
+        }
+    }
 
+    this.parse = function(codeArray){
+        this.error = [];
+        var firstOfFirstSymbol = this.firstOf(this.startSymbol);
+        if(!firstOfFirstSymbol[codeArray[0]]) {
+            this.error.push('Token inesperado no começo');
+            return;
+        }
+
+        var followSet = false;
+        for(var i = 0; i<codeArray.length ; i++) {
+            var element = codeArray[i];
+            if(followSet) {
+                if(!followSet[element]) {
+                   this.error.push('Token inesperado: ' + element);
+                   return; 
+                }
+            }
+            followSet = this.followOf(codeArray[i]);
+        }
+
+        if(!followSet['$']) {
+            this.error.push('Estao faltando tokens');
+        }
     }
 
 }

@@ -82,6 +82,7 @@ function Compiler(){
         logBonitinho("Analise sintatica:", "info");
         if( (this.anaLex.error.length == 0) && (this.anaLex.tokenCodeArray.length > 0) )
             var analexResult = this.anaSint.parse(this.anaLex.tokenCodeArray, this.anaSint.firstRuleName, this.anaSint.BNF)
+            //var analexResult = this.anaSint.parse(this.anaLex.tokenCodeArray);
         logBonitinho(analexResult, "info");    
 
 
