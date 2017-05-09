@@ -2,7 +2,7 @@ function Compiler(){
 
     this.codeFile  = new CodeFile(); //nova modelagem -> pode ser um array de arquivos -> abre possibilidade
     this.anaLex    = new Analex();
-    this.anaSint   = new Anasint();
+    this.anaSint   = new FirstFollow();
     
 
     // Function witch runs evetime a Key is pressed.
@@ -71,7 +71,7 @@ function Compiler(){
         console.timeEnd("Tempo de execução:");
 
         logBonitinho("Token Código Interpretado:", "info");
-        logBonitinho( this.anaLex.tokenCodeArray.join(""), "data" );
+        logBonitinho( this.anaLex.tokenCodeString.join(""), "data" );
         
         logBonitinho("Tabela de Simbolos:", "info");
         printSymbolsTable(this.anaLex.symbolsTable);
@@ -80,9 +80,8 @@ function Compiler(){
         printError(this.anaLex.error);
 
         logBonitinho("Analise sintatica:", "info");
-        if( (this.anaLex.error.length == 0) && (this.anaLex.tokenCodeArray.length > 0) )
-            var analexResult = this.anaSint.parse(this.anaLex.tokenCodeArray, this.anaSint.firstRuleName, this.anaSint.BNF)
-            //var analexResult = this.anaSint.parse(this.anaLex.tokenCodeArray);
+        if( (this.anaLex.error.length == 0) && (this.anaLex.tokenCodeArray.length > 0) )            
+            var analexResult = this.anaSint.parse(this.anaLex.tokenCodeArray);
         logBonitinho(analexResult, "info");    
 
 

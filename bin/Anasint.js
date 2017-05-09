@@ -3,10 +3,20 @@ function Anasint() {
     this.BNF = [];
     this.firstRuleName = [];
 
+    this.terminalArray = [];
+    this.nonTerminalArray = [];
+
+    var terminalSet = {};
+    var nonTerminalSet = {};
+
     this.readBNF = function (codeFile) {
 
         this.BNF = [];
         this.firstRuleName = [];
+        this.terminalArray = [];
+        this.nonTerminalArray = [];
+        var terminalSet = {};
+        var nonTerminalSet = {};
 
         for (var i = 0; i < codeFile.rowsCount(); i++) {
 
@@ -23,8 +33,9 @@ function Anasint() {
                 var leftMember = rowTextSplit[0].trim();
                 var rightMembers = rowTextSplit[1].trim();
 
-                if( i == 0 )
+                if( i == 0 ){
                     this.firstRuleName.push(leftMember);
+                }
 
                 var rightMembersArray = rightMembers.split(" ");
                 rightMembersArray.remove("");
@@ -40,6 +51,78 @@ function Anasint() {
                 this.BNF[leftMember].derivations.push(rightMembersArray);
             }
         }
+    }
+
+    this.calculateTerminals = function() {
+        for (var key in this.BNF) {
+            if( ehToken(key) ){
+                nonTerminalSet[key] = key;
+            } 
+            else  {
+                terminalSet[key] = key;                
+            }
+
+            var rightSideArray = this.BNF[key];
+
+            for( var i = 0; i<rightSideArray.length; i++){
+                var simbol = rightSideArray[i];
+                if( ehSimboloNaoTerminal2(simbol, this.BNF) ){
+                    nonTerminalSet[simbol] = simbol;
+                } 
+                else  {
+                    terminalSet[simbol] = simbol;                
+                }
+            }
+
+        }    
+
+        this.terminalArray = Object.values( terminalSet  );
+        this.nonTerminalArray  = Object.values( nonTerminalSet  );
+    }
+
+     function ehSimboloNaoTerminal2(simbolo) {
+            
+            // se nao achar regra de producao para determinado nao terminal, 
+            // eh porque ele eh uma regra de producao de um terminal e nao consta na BNF por conta de regex
+            if( this.BNF[simbolo] == undefined ){
+                return false;
+            }
+            else {
+                if( this.BNF[simbolo].derivations == undefined ){
+                    return false;
+                } else {
+                    var regrasProducao = this.BNF[simbolo].derivations;     
+                    
+                    for(var i = 0; i < regrasProducao.length; i++){
+                        for(var j = 0; j < leftTerms.length; j++){
+                            var symbol = regrasProducao[i][j];
+                            if( (symbol[0] == "<") && ( symbol.length > 1 ) )
+                                return true;    
+                        } 
+                    }         
+                    
+                }               
+            }
+               
+            return false;
+        }
+        
+
+    this.ehToken = function(symbol) {
+        
+        if( this.BNF[symbol] == undefined )
+            return true;
+        else{
+            if(this.BNF[symbol].derivations == undefined)
+                return true;
+            else{
+                
+
+                
+            }
+
+        }    
+
     }
 
     // the first nonTerminal of a terminal derivation
@@ -129,29 +212,15 @@ function Anasint() {
 
     }
 
+   
+
+
     this.parse = function (tokenCodeArray, firstRule, regrasProducaoBNF ) {
 
         var gram = {
                         regrasProducao: regrasProducaoBNF,
                         simboloInicial: firstRule,
                    };
-
-        
-        function ehSimboloNaoTerminal(simbolo, gram) {
-            
-            // se nao achar regra de producao para determinado nao terminal, 
-            // eh porque ele eh uma regra de producao de um terminal e nao consta na BNF por conta de regex
-            if(gram.regrasProducao[simbolo] == undefined)
-                return false;
-
-            var regraProducao = gram.regrasProducao[simbolo].derivations[0];
-            
-            // se tem mais de uma regra de producao, nao é NAO terminal.
-            if( (regraProducao[0][0] == "<") && ( regraProducao[0].length > 1 ) )
-                return true;
-               
-            return false;
-        }
 
         function aplicarRegra(composicaoArray, regraArray, i) {
 
@@ -167,6 +236,22 @@ function Anasint() {
             
             return comp;
             
+        }
+
+        function ehSimboloNaoTerminal(simbolo, gram) {
+            
+            // se nao achar regra de producao para determinado nao terminal, 
+            // eh porque ele eh uma regra de producao de um terminal e nao consta na BNF por conta de regex
+            if(gram.regrasProducao[simbolo] == undefined)
+                return false;
+
+            var regraProducao = gram.regrasProducao[simbolo].derivations[0];
+            
+            // se tem mais de uma regra de producao, nao é NAO terminal.
+            if( (regraProducao[0][0] == "<") && ( regraProducao[0].length > 1 ) )
+                return true;
+               
+            return false;
         }
 
         function procuraSimboloNaoTerminal(composicaoArray, gram) {

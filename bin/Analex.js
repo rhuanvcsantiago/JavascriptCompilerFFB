@@ -3,6 +3,7 @@ function Analex(){
     this.symbolsTable = new SymbolsTable(); //Array Tokens
 	this.error = [];
 	this.tokenCodeArray = [];
+	this.tokenCodeString = [];
 	//this.codeArray = [];
 
     
@@ -29,10 +30,14 @@ function Analex(){
 			if(token == ',') {
 				classe = 'VARIABLE_SEPARATOR';
 			}
+			if(token == '#') {
+				classe = 'FUNCTION_SEPARATOR';
+			}
 		}
 
 		if( classe != "COMMENT" ){
-			this.tokenCodeArray.push("<"+classe+">");
+			this.tokenCodeArray.push( {classe: "<"+classe+">",token: token, position: position} );
+			this.tokenCodeString.push("<"+classe+">");
 			//this.codeArray.push(token);
 		}
 
@@ -42,6 +47,7 @@ function Analex(){
 
     this.tokenizer = function(codeFile){
 		this.tokenCodeArray = [];
+		this.tokenCodeString = [];
 		this.error = [];
 		this.symbolsTable.clean();
         
@@ -83,7 +89,7 @@ function Analex(){
 					classe = "espaco";
 				} else if (char == ';') {
 					classe = "ponto_e_virgula";
-				} else if (char == '(' || char == ')' || char == '{' || char == '}' || char == '[' || char == ']' || char == ',') {
+				} else if (char == '(' || char == ')' || char == '{' || char == '}' || char == '[' || char == ']' || char == ',' || char == '#') {
 					classe = "separador";
 				} else if(char == '\n') {
 					classe = "nova_linha";

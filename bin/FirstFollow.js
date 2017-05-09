@@ -1,8 +1,9 @@
 function FirstFollow() {    
-    var EPSILON = "ε";
+    var EPSILON = "<EPISILON>";
     this.BNF = [];
     this.startSymbol = null;
-    this.error = []
+    this.error = []  
+    this.predictSetTable = [];  
 
     this.readBNF = function (codeFile) {
 
@@ -192,43 +193,98 @@ function FirstFollow() {
         this.buildFollowSets();
     }
 
-    this.predictSetTable = function() {
+    this.calculatePredictSetTable = function() {        
         var keys = Object.keys(this.BNF);
         var terminalSymbols = [];
         var nonTerminalSymbols = [];
+        var predictSetTable = this.predictSetTable = [];
         for (var k = 0; k < keys.length; k++) {
-            var key = key[k];
+            var key = keys[k];
             if(this.BNF[key].terminal) {
                 terminalSymbols.push(key);
             } else {
                 nonTerminalSymbols.push(key);
+                predictSetTable[key] = [];
+                var derivations = this.BNF[key].derivations;
+                for(var d=0; d<derivations.length; d++) {
+                    var derivation = derivations[d];
+                    var result = [];
+                    if(derivation[0] == EPSILON) {
+                        result = this.followOf(key);
+                    } else {
+                        result = this.firstOf(derivation[0]);
+                    }
+                    var resultKeys = Object.keys(result);
+                    for(var r = 0; r<resultKeys.length; r++) {
+                        if(predictSetTable[key][resultKeys[r]] == undefined) {
+                            predictSetTable[key][resultKeys[r]] = derivation;
+                        } else {
+                            throw new Error("Já existe regra para: " + key + " em " + resultKeys[r] + " Tinha antes: " + predictSetTable[key][resultKeys[r]].join(",") );
+                        }                        
+                    }
+                }
+            }
+        }
+        return predictSetTable;
+    }
+
+    this.parse = function(codeArray){
+        this.buildFirstsAndFollows();
+        this.calculatePredictSetTable();
+        var stack = [];
+        stack.push('$');
+        stack.push(this.startSymbol);
+        codeArray[codeArray.length] = {classe:'$'};
+        for(var c = 0; c < codeArray.length; c++) {
+            var token = this.getTokenClass(c,codeArray);
+            console.log(token);
+            console.log(stack.join(','));
+            if(token == stack[stack.length-1]) {
+                stack.pop();
+            } else {                
+                var symbol = stack.pop();
+                if( symbol == "$" ) {
+                    throw new Error('Erro Sintático - Token não esperado: ' + this.getTokenClass(c,codeArray) 
+                                + " Token: [" + this.getTokenName(c,codeArray) 
+                                + "] Posição: " + this.getTokenPosition(c,codeArray) );
+                }
+                if(this.BNF[symbol].terminal) {
+                    throw new Error('Erro Sintático - Token Esperado: ' + this.BNF[symbol].derivations.join(" ou ") 
+                                + "Token recebido: " + this.getTokenClass(c,codeArray) 
+                                + " Token: [" + this.getTokenName(c,codeArray) 
+                                + "] Posição: " + this.getTokenPositionExpected(c,codeArray));
+                }
+                var rules = this.predictSetTable[symbol][token];
+                if ( rules == undefined ) {
+                   throw new Error('Erro Sintático - Token não esperado: ' + this.getTokenClass(c,codeArray) 
+                                + " Token: " + this.getTokenName(c,codeArray) 
+                                + " Posição: " + this.getTokenPosition(c,codeArray) );
+                } else {
+                   for(var i = rules.length-1; i>=0;i-- ) {
+                       if(rules[i] != EPSILON) {
+                           stack.push(rules[i]);
+                       }                       
+                   }
+                }
+                c--;
             }
         }
     }
 
-    this.parse = function(codeArray){
-        this.error = [];
-        var firstOfFirstSymbol = this.firstOf(this.startSymbol);
-        if(!firstOfFirstSymbol[codeArray[0]]) {
-            this.error.push('Token inesperado no começo');
-            return;
-        }
+    this.getTokenClass = function(position,codeArray){
+        return codeArray[position].classe;
+    }
 
-        var followSet = false;
-        for(var i = 0; i<codeArray.length ; i++) {
-            var element = codeArray[i];
-            if(followSet) {
-                if(!followSet[element]) {
-                   this.error.push('Token inesperado: ' + element);
-                   return; 
-                }
-            }
-            followSet = this.followOf(codeArray[i]);
-        }
+    this.getTokenPosition = function(position,codeArray){
+        return codeArray[position].position.row + "," + codeArray[position].position.col;
+    }
 
-        if(!followSet['$']) {
-            this.error.push('Estao faltando tokens');
-        }
+    this.getTokenName = function(position,codeArray){
+        return codeArray[position].token;
+    }
+
+    this.getTokenPositionExpected = function(position,codeArray){
+        return codeArray[position].position.row + "," + (codeArray[position].position.col+codeArray[position].token.length-1);
     }
 
 }
