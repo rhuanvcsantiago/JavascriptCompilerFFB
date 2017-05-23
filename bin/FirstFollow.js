@@ -188,6 +188,12 @@ function FirstFollow() {
         }
     }
 
+    this.printPrintAnaSemStack = function() {
+        for(var i=0; i<this.anaSemStack.length; i++) {
+            console.log(this.anaSemStack[i]);
+        }
+    }
+
     this.buildFirstsAndFollows = function() {
         this.buildFirstSets();
         this.buildFollowSets();
@@ -231,18 +237,19 @@ function FirstFollow() {
     this.parse = function(codeArray){
         this.buildFirstsAndFollows();
         this.calculatePredictSetTable();
+        this.anaSemStack = [];
         var stack = [];
         stack.push('$');
         stack.push(this.startSymbol);
         codeArray[codeArray.length] = {classe:'$'};
         for(var c = 0; c < codeArray.length; c++) {
             var token = this.getTokenClass(c,codeArray);
-            console.log(token);
-            console.log(stack.join(','));
+            console.log(token);            
             if(token == stack[stack.length-1]) {
-                stack.pop();
+                this.anaSemStack.push([stack.pop(),codeArray[c]]);
             } else {                
                 var symbol = stack.pop();
+                this.anaSemStack.push(symbol);
                 if( symbol == "$" ) {
                     throw new Error('Erro Sintático - Token não esperado: ' + this.getTokenClass(c,codeArray) 
                                 + " Token: [" + this.getTokenName(c,codeArray) 

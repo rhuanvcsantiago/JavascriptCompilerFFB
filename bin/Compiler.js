@@ -3,6 +3,7 @@ function Compiler(){
     this.codeFile  = new CodeFile(); //nova modelagem -> pode ser um array de arquivos -> abre possibilidade
     this.anaLex    = new Analex();
     this.anaSint   = new FirstFollow();
+    this.anaSem    = new Anasem();
     
 
     // Function witch runs evetime a Key is pressed.
@@ -80,10 +81,14 @@ function Compiler(){
         printError(this.anaLex.error);
 
         logBonitinho("Analise sintatica:", "info");
-        if( (this.anaLex.error.length == 0) && (this.anaLex.tokenCodeArray.length > 0) )            
+        
+        if( (this.anaLex.error.length == 0) && (this.anaLex.tokenCodeArray.length > 0) )   {
+           
             var analexResult = this.anaSint.parse(this.anaLex.tokenCodeArray);
-        logBonitinho(analexResult, "info");    
-
+            //logBonitinho(analexResult, "info");
+            this.anaSem.execute(this.anaSint.anaSemStack);
+            
+        }         
 
     }
 }
