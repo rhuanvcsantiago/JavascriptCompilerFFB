@@ -60,7 +60,7 @@ function Compiler(){
         }
 
         console.clear();
-        console.log("%c==============================\n===========  DEBUG ===========\n==============================", "background: black; color: white; font-size: 20px; display: block;")
+        console.log("%c=rhuan=============================\n===========  DEBUG ===========\n==============================", "background: black; color: white; font-size: 20px; display: block;")
        
         logBonitinho("Código Lido:", "info");
         logBonitinho( this.codeFile.toString(), "data" );
@@ -86,6 +86,7 @@ function Compiler(){
            
             var analexResult = this.anaSint.parse(this.anaLex.tokenCodeArray);
             //logBonitinho(analexResult, "info");
+            this.anaSem.contextAnaliser(this.anaSint.anaSemStack);
             this.anaSem.execute(this.anaSint.anaSemStack);
             
         }         
